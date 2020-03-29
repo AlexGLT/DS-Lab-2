@@ -4,7 +4,7 @@ import main
 dataFrameVoltron = main.DataFrameCreate("D:\Documents\.Projects\DataScience\Laba-2")
 
 
-class StockExample(server.App):
+class DataVisualisation(server.App):
     title = "Historical Stock Prices"
 
     inputs = [{"type": 'dropdown',
@@ -106,5 +106,5 @@ class StockExample(server.App):
 
         return plot.get_figure()
 
-app = StockExample()
-app.launch(port=8081)
+Application = DataVisualisation()
+Application.launch(port=8080s)
