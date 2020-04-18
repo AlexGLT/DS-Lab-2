@@ -3,9 +3,8 @@ import main
 
 dataFrameVoltron = main.DataFrameCreate("D:\Documents\.Projects\DataScience\Laba-2")
 
-
 class DataVisualisation(server.App):
-    title = "Historical Stock Prices"
+    title = "Laba 2"
 
     inputs = [{"type": 'dropdown',
                "label": 'Тип даних',
@@ -87,8 +86,10 @@ class DataVisualisation(server.App):
         firstYearLim = int(yearLimits[0])
         secondYearLim = int(yearLimits[1])
 
-        return dataFrameVoltron.loc[(dataFrameVoltron["Region"] == region) & (dataFrameVoltron["Week"] >= firstWeekLim) & (
-                dataFrameVoltron["Week"] <= secondWeekLim) & (dataFrameVoltron["Year"] >= firstYearLim) & (dataFrameVoltron["Year"] <= secondYearLim), ["Year", "Week", type]]
+        return dataFrameVoltron.loc[
+            (dataFrameVoltron["Region"] == region) & (dataFrameVoltron["Week"] >= firstWeekLim) & (
+                    dataFrameVoltron["Week"] <= secondWeekLim) & (dataFrameVoltron["Year"] >= firstYearLim) & (
+                        dataFrameVoltron["Year"] <= secondYearLim), ["Year", "Week", type]]
 
     def getPlot(self, params):
         dataFrame = self.getData(params).reset_index().drop(["Year", "Week", "index"], axis=1)
@@ -107,4 +108,4 @@ class DataVisualisation(server.App):
         return plot.get_figure()
 
 Application = DataVisualisation()
-Application.launch(port=8080s)
+Application.launch(port=8080)
