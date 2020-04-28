@@ -1,7 +1,6 @@
 from spyre import server
 import pandas as pd
 import numpy as np
-import matplotlib as plt
 import main
 
 dataFrameVoltron = main.DataFrameCreate("D:\Documents\.Projects\DataScience\Laba-2")
@@ -107,13 +106,17 @@ class DataVisualisation(server.App):
 
     def maxVHI(self, params):
         dfs = []
+        dfs1 = []
+
         weeks = dataFrameVoltron.Week.unique()
 
         for i in weeks:
             DF = dataFrameVoltron[dataFrameVoltron["Week"] == i].VHI.max()
+            dfq = dataFrameVoltron[dataFrameVoltron["Week"] == i].VHI.min()
             dfs.append(DF)
+            dfs1.append(dfq)
 
-        dataFrame = pd.DataFrame({"Week": weeks, "MaxVHI": dfs})
+        dataFrame = pd.DataFrame({"Week": weeks, "MaxVHI": dfs, "MinVHI": dfs1})
 
         return dataFrame
 
@@ -121,12 +124,7 @@ class DataVisualisation(server.App):
         dataFrame = self.mainTable(params).reset_index().drop(["Year", "Week", "index"], axis=1)
         plot = dataFrame.plot(ylim=[0, 100], use_index=True)
 
-        if(params["type"] == "VCI"):
-            plot.set_ylabel("VCI")
-        if (params["type"] == "TCI"):
-            plot.set_ylabel("TCI")
-        if(params["type"] == "VHI"):
-            plot.set_ylabel("VHI")
+        plot.set_ylabel(params["type"])
 
         plot.set_xlabel("index")
         plot.set_title(params["type"])
