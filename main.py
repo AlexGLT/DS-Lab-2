@@ -27,7 +27,7 @@ def DataFrameCreate(path):
 
     for filename in all_files:
         dataFrame = pd.read_csv(filename, index_col=False, header=1, delimiter=',', names=colnames, engine='python',
-                                usecols=[0, 1, 2, 3, 4, 5, 6], skipfooter=42)
+                                usecols=[0, 1, 2, 3, 4, 5, 6], skipfooter=42, na_values=["-1"]).dropna()
         dataFrame["Region"] = Reg
         Reg += 1
         dataFrames.append(dataFrame)
@@ -74,6 +74,6 @@ def ExtremeDroughts(dataFrame, year):
         print(dataFrame[dataFrame["Year"] == year & (dataFrame["Week"] == week) & dataFrame["VHI"]])
 
 
-#for i in range(1, 28):
-#    VHIDownload(i)
+# for i in range(1, 28):
+#     VHIDownload(i)
 

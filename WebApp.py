@@ -1,4 +1,7 @@
 from spyre import server
+import pandas as pd
+import numpy as np
+import matplotlib as plt
 import main
 
 dataFrameVoltron = main.DataFrameCreate("D:\Documents\.Projects\DataScience\Laba-2")
@@ -51,30 +54,41 @@ class DataVisualisation(server.App):
                "key": "weekInterval",
                "label": "Напиши тижневий інтервал, через дефіс",
                "value": "1-52",
-               "action_id": "simple_html_output"},
+               "action_id": "update_data"},
 
               {"type": "text",
                "key": "yearInterval",
                "label": "Напиши річний інтервал, через дефіс",
                "value": "1982-2020",
-               "action_id": "simple_html_output"}]
+               "action_id": "update_data"}]
 
     controls = [{"type": "hidden", "id": "update_data"}]
 
-    tabs = ["Table", "Plot"]
+    tabs = ["Table", "MaxVHI", "Plot", "MaxVHIPlot"]
 
     outputs = [{"type": "table",
-                "id": "table_id",
+                "id": "mainTable",
                 "control_id": "update_data",
                 "tab": "Table",
                 "on_page_load": True},
 
-               {"type": "plot",
-                "id": "plot",
+               {"type": "table",
+                "id": "maxVHI",
                 "control_id": "update_data",
-                "tab": "Plot"}]
+                "tab": "MaxVHI",
+                "on_page_load": True},
 
-    def getData(self, params):
+               {"type": "plot",
+                "id": "mainPlot",
+                "control_id": "update_data",
+                "tab": "Plot"},
+
+               {"type": "plot",
+                "id": "maxVHIPlot",
+                "control_id": "update_data",
+                "tab": "MaxVHIPlot"}]
+
+    def mainTable(self, params):
         type = params["type"]
         region = int(params["region"])
         weekLimits = params["weekInterval"].split("-")
@@ -91,9 +105,21 @@ class DataVisualisation(server.App):
                     dataFrameVoltron["Week"] <= secondWeekLim) & (dataFrameVoltron["Year"] >= firstYearLim) & (
                         dataFrameVoltron["Year"] <= secondYearLim), ["Year", "Week", type]]
 
-    def getPlot(self, params):
-        dataFrame = self.getData(params).reset_index().drop(["Year", "Week", "index"], axis=1)
-        plot = dataFrame.plot()
+    def maxVHI(self, params):
+        dfs = []
+        weeks = dataFrameVoltron.Week.unique()
+
+        for i in weeks:
+            DF = dataFrameVoltron[dataFrameVoltron["Week"] == i].VHI.max()
+            dfs.append(DF)
+
+        dataFrame = pd.DataFrame({"Week": weeks, "MaxVHI": dfs})
+
+        return dataFrame
+
+    def mainPlot(self, params):
+        dataFrame = self.mainTable(params).reset_index().drop(["Year", "Week", "index"], axis=1)
+        plot = dataFrame.plot(ylim=[0, 100], use_index=True)
 
         if(params["type"] == "VCI"):
             plot.set_ylabel("VCI")
@@ -103,6 +129,15 @@ class DataVisualisation(server.App):
             plot.set_ylabel("VHI")
 
         plot.set_xlabel("index")
+        plot.set_title(params["type"])
+
+        return plot.get_figure()
+
+    def maxVHIPlot(self, params):
+        dataFrame = self.maxVHI(params).reset_index().drop(["Week", "index"], axis=1)
+        plot = dataFrame.plot(ylim=[0, 100], use_index=True)
+
+        plot.set_xlabel("Week")
         plot.set_title(params["type"])
 
         return plot.get_figure()
